@@ -54,13 +54,13 @@
 
     \begin{equation*}
         KM = H(ZZ \parallel \text{OtherInfo})
-    \end{equation*}
+    \end{equation*}\url{https://www.ietf.org/rfc/rfc2631.txt}
 
     where $H$ represents the message digest function, specifically SHA-1, and $ZZ$ is the shared secret value. The $ZZ$ value must include leading zeros to ensure it occupies as many octets as the prime number $p$. For example, if $p$ is 1024 bits, then $ZZ$ should be 128 bytes long.
     To generate the KEK, one or more blocks of $KM$ are created, with the counter incremented for each block until sufficient keying material has been generated. These blocks are concatenated to form the KEK:
     \begin{equation*}
         KEK = KM(\text{counter}=1) \parallel KM(\text{counter}=2) \parallel \ldots
-    \end{equation*}
+    \end{equation*}\url{https://www.ietf.org/rfc/rfc2631.txt}
     The secret entropy of this process comes from $ZZ$.
     Even if a longer string than $ZZ$ is produced, the effective key space of the KEK is limited by the size of $ZZ$.
     \item How the shared secret ZZ is defined?
@@ -68,21 +68,21 @@
 
     \begin{equation*}
         ZZ = g^{(xb \cdot xa)} \mod p
-    \end{equation*}
+    \end{equation*}\url{https://www.ietf.org/rfc/rfc2631.txt}
 
     Here, \( g \) is a generator value agreed upon by both parties, \( p \) is a large prime number, and \( xa \) and \( xb \) are the private keys of party A and party B, respectively. The computed value of \( ZZ \) is the result of party A raising party B's public key to the power of their own private key modulo \( p \), and vice versa for party B. This results in both parties arriving at the same shared secret, which can then be used to derive a symmetric key for encryption and decryption of messages.
 
 
     \item Where the primality test is used? How the robust primality test is defined?
-    In the Diffie-Hellman key agreement method, a primality test is employed during the generation of the group parameters, specifically the primes \( p \) and \( q \).
+    In the Diffie-Hellman key agreement method, a primality test is employed during the generation of the group parameters, specifically the primes \( p \) and \( q \) \url{https://www.ietf.org/rfc/rfc2631.txt}.
     A robust primality test is defined as a test where the probability that a composite number is erroneously identified as a prime is at most \( 2^{-80} \).
-    This stringent requirement is essential because the security of the Diffie-Hellman method depends on the hardness of the discrete logarithm problem, which assumes \( p \) and \( q \) are prime.
+    Diffie-Hellman method depends on the hardness of the discrete logarithm problem, which assumes \( p \) and \( q \) are prime.
     If composite numbers were mistakenly used, the discrete logarithm problem could be more easily solved, compromising the encryption.
-    The robust primality test thus ensures the integrity of \( p \) and \( q \) as prime numbers, forming the basis for preventing adversaries from determining the shared secret key used by the communicating parties for encryption and decryption purposes.
+    The robust primality test thus ensures the integrity of \( p \) and \( q \) as prime numbers, forming the basis for preventing adversaries from determining the shared secret key.
 
     \item Why the group parameter validation process is needed?
     Group parameter validation is a critical security measure in the Diffie-Hellman key agreement method.
-    It verifies that the parameters \( p \) and \( q \) satisfy the equation \( p = qj + 1 \), confirming they adhere to the X9.42 standards for secure Diffie-Hellman implementations.
+    It verifies that the parameters \( p \) and \( q \) satisfy the equation \( p = qj + 1 \), confirming they adhere to the X9.42 standards for secure Diffie-Hellman implementations \url{https://www.ietf.org/rfc/rfc2631.txt}.
     It ensures that the parameters are generated in a truly random and non-predictable manner, which is vital to prevent potential attackers from exploiting any patterns in the parameter generation process.
     For example, consider the validation of a prime number \( p \).
     The recipient of the key can check that \( p \) is of the correct form by confirming that for some integer \( j \), \( p = qj + 1 \).
@@ -92,7 +92,7 @@
     In Ephemeral-Static Mode, the sender generates a new ephemeral key pair for each communication session, while the recipient uses a static, often certified, key pair.
     This results in a different shared secret \( ZZ \) for each session, providing enhanced security.
     In Static-Static Mode Both parties use static key pairs that do not change over time.
-    This can lead to the same shared secret \( ZZ \) for each session unless measures such as introducing unique partyAInfo are taken.
+    This can lead to the same shared secret \( ZZ \) for each session unless measures such as introducing unique partyAInfo are taken \url{https://www.ietf.org/rfc/rfc2631.txt}.
     Ephemeral-Static mode differs from Static-Static mode in that the former generates a new key pair for each session, ensuring a unique shared secret each time, while the latter uses fixed key pairs, resulting in a consistent shared secret across sessions unless additional unique information is provided to diversify the keys.
 
 \end{enumerate}
@@ -123,7 +123,7 @@ $\mathsf{Dec}(sk,c):$
 \end{multicols}
 \end{tcolorbox}
 
-It could be useful to notice that instead of standart RSA, we are using a variant of RSA where the modulus $n$ is $n = 2p^2$ instead of $n = pq$ (where $p$ and $q$ are distinct prime numbers).
+It could be useful to notice that instead of standart RSA, we are using a variant of RSA where the modulus $n$ is $n = p^2$ instead of $n = pq$ (where $p$ and $q$ are distinct prime numbers).
 Given a public key \( (e, n) \) and modulus \( n = p^2 \), we could maybe perform the following attack:
 
 \begin{enumerate}
@@ -153,21 +153,129 @@ Eve intercepts the public key \( (e, n) \) and observes that \( n = p^2 \). Let'
 
 
 \paragraph{Task 3 (ElGamal encryption).} Consider the ElGamal cryptosystem with a public key $h$ and a private key $x$.
+1. Adversary Eve has intercepted ElGamal ciphertext $c = (c_1,c_2)$ that she wants to decrypt.
+Suppose that Eve has a friend that provides her with the decryption of any other chosen ciphertext $c' \neq c $.
+Show how can Eve decrypt $c$.
+Eve has intercepted an ElGamal ciphertext \( c = (c_1, c_2) = (7, 8) \) and has access to a decryption oracle for another ciphertext \( c' = (c'_1, c'_2) = (7, 12) \) with plaintext \( m' = 2 \).
+The system parameters are a prime \( p = 17 \), a generator \( g = 3 \), and Eve's private key \( x = 15 \) (Eve's friend gave these to decrypt the first message).
+
 \begin{enumerate}
-    \item Adversary Eve has intercepted ElGamal ciphertext $c = (c_1,c_2)$ that she wants to decrypt. Suppose that Eve has a friend that provides her with the decryption of any other chosen ciphertext $c' \neq c $. Show how can Eve decrypt $c$.
-    \item Adversary Carol intercepted two ElGamal ciphertexts $(c_{11} , c_{12})$ and $(c_{21} , c_{22})$ that correspond to some plaintext messages (not known to Eve) $m_1$ and $m_2$. What information can Eve learn about $m_1$ and $m_2$, if she observes that $c_{11} = c_{21}$?
+    \item Compute the public key \( h \) using modular exponentiation:
+    \[ h = g^x \mod p = 3^{15} \mod 17 \]
+    Simplifying this with modular exponentiation gives \( h = 4 \).
+    \item Calculate the shared secret for \( c' \):
+    \[ s' = (c'_1)^x \mod p = 7^{15} \mod 17 \]
+    Eve computes \( s' \) using a fast exponentiation algorithm.
+    \item Find the inverse of \( s' \) in the group \( \mathbb{Z}_p^* \):
+    \[ (s')^{-1} \mod p \]
+    \item Decrypt \( c' \) to confirm \( m' \):
+    \[ m' = c'_2 \cdot (s')^{-1} \mod p \]
+    \item Calculate the shared secret for the intercepted ciphertext \( c \):
+    \[ s = c_1^x \mod p \]
+    \item Decrypt the intercepted ciphertext \( c \) to obtain the plaintext \( m \):
+    \[ m = c_2 \cdot s^{-1} \mod p \]
 \end{enumerate}
 
-\paragraph{Task 4 (RSA encryption).} Alice sends the same invitation to her wedding with Bob to their three friends: Albus (with $pk_1=(115,3)$), Charlie (with $pk_2=(58,3)$) and Dan (with $pk_3=(187,3)$). Invitation $m$ is encrypted using the RSA algorithm. \\
+Eve can decrypt the ciphertext \( c \) because she can compute the shared secret using her private key and the first part of the ciphertext.
+The decryption of \( c' \) is simply to verify that she has computed \( s' \) correctly.
+\\
 
-Eve was not invited to the wedding but wants to come there, she needs to find out address of the wedding venue. Eve intercepts all $3$ ciphertexts $c_1= 18,c_2= 21,c_3= 48$. Show how can Eve recover the invitation message $m$ without factoring public keys. What is plaintext message $m$?
+2. Adversary Carol intercepted two ElGamal ciphertexts $(c_{11} , c_{12})$ and $(c_{21} , c_{22})$ that correspond to some plaintext messages (not known to Eve) $m_1$ and $m_2$.
+What information can Eve learn about $m_1$ and $m_2$, if she observes that $c_{11} = c_{21}$?
+This suggests that the same ephemeral key \( k \) was used in the encryption process of both plaintext messages \( m_1 \) and \( m_2 \).
+
+Since \( c_{11} = c_{21} \), we have:
+\[ g^k \mod p = c_{11} = c_{21} \]
+
+Thus, the encrypted messages satisfy:
+\[ c_{12} = m_1 \cdot h^k \mod p \]
+\[ c_{22} = m_2 \cdot h^k \mod p \]
+
+Given that \( h^k \) is the same for both messages, Carol can determine the ratio of \( m_1 \) to \( m_2 \) by calculating:
+\[ \frac{c_{12}}{c_{22}} = \frac{m_1 \cdot h^k}{m_2 \cdot h^k} \mod p \]
+\[ \frac{c_{12}}{c_{22}} = \frac{m_1}{m_2} \mod p \]
+
+This ratio reveals the relationship between \( m_1 \) and \( m_2 \) modulo \( p \).
+Without additional information or specific constraints on the messages, Carol cannot deduce the exact values of \( m_1 \) and \( m_2 \) from this ratio alone.
+This particular situation exploits the lack of forward secrecy in the use of the ephemeral key \( k \).
+In ElGamal encryption, each messsage should be encrtpted with a different, randomly chosen \( k \) to ensure that the encryption of different messages doesn't reveal any relationships between them.
+If the same \( k \) is used, as is the case observed by Carol where \( c_{11} = c_{21} \), it violates this principle and opens the door to potential security weaknesses.
+If Carol suspects that the same message is sent multiple times (perhaps with some minor changes), the constant ratio could help confirm this.
+For example, if \( m_1 = m_2 \), then the ratio would equal 1, which would be a clear indicator and this would break security principles.
+
+
+
+\paragraph{Task 4 (RSA encryption).} Alice sends the same invitation to her wedding with Bob to their three friends: Albus (with $pk_1=(115,3)$), Charlie (with $pk_2=(58,3)$) and Dan (with $pk_3=(187,3)$). Invitation $m$ is encrypted using the RSA algorithm.
+Eve was not invited to the wedding but wants to come there, she needs to find out address of the wedding venue.
+Eve intercepts all $3$ ciphertexts $c_1= 18,c_2= 21,c_3= 48$.
+Show how can Eve recover the invitation message $m$ without factoring public keys.
+What is plaintext message $m$?\\
+
+We cuold try to take advantage of a property of the RSA algorithm when the same message \( m \) is encrypted with multiple public keys that have the same exponent \( e \).
+Given that the exponent \( e = 3 \) in all public keys, and each friend has a different \( n \), Eve can use the Chinese Remaindr Theorem to recover the message.
+Eve intercepts three ciphertexts \( c_1, c_2, c_3 \) encrypted under RSA with the public keys \( pk1, pk2, pk3 \) and exponent \( e = 3 \).
+The ciphertexts correspond to the same plaintext message \( m \) and are \( c_1 = 18 \), \( c_2 = 21 \), \( c_3 = 48 \).
+
+To recover \( m \), Eve can use the Chinese Remainder Theorem to solve the system:
+\begin{align*}
+    m^3 &\equiv 18 \mod 115, \\
+    m^3 &\equiv 21 \mod 58, \\
+    m^3 &\equiv 48 \mod 187.
+\end{align*}
+
+Using the CRT, Eve finds a unique \( M \) such that:
+\begin{align*}
+    M &\equiv 18 \mod 115, \\
+    M &\equiv 21 \mod 58, \\
+    M &\equiv 48 \mod 187.
+\end{align*}
+
+Eve performs the following steps to compute \(M\) using the Chinese Remainder Theorem:
+
+\begin{enumerate}
+    \item Calculate the total product of the moduli:
+    \[ N = n_1 \cdot n_2 \cdot n_3 = 115 \cdot 58 \cdot 187 = 1,247,290 \]
+
+    \item Calculate \(N_i\) values:
+    \[ N_1 = \frac{N}{n_1} = 10,846, \quad N_2 = \frac{N}{n_2} = 21,505, \quad N_3 = \frac{N}{n_3} = 6,670 \]
+
+    \item Compute the modular inverses \(x_i\):
+    \[ x_1 = 16 \mod 115, \quad x_2 = 49 \mod 58, \quad x_3 = 3 \mod 187 \]
+
+    Find \( x_1 \) such that \( N_1 \cdot x_1 \equiv 1 \mod n_1 \).
+
+    To find the modular inverse \( x_1 \) for \( N_1 \) modulo \( n_1 \) I used Extended Euclidean Algorithm.
+    This process was repeated similarly for \( x_2 \) and \( x_3 \) using their respective \( N_i \) and \( n_i \) values
+    (the long calculations are abbreviated from task but yeilded \( x_1=16, x_2=49, x_3=3 \)).
+
+    \item Construct \(M\) using the CRT formula:
+    \begin{align*}
+        M &= (c_1 \cdot N_1 \cdot x_1 + c_2 \cdot N_2 \cdot x_2 + c_3 \cdot N_3 \cdot x_3) \mod N \\
+        &= (18 \cdot 10,846 \cdot 16 + 21 \cdot 21,505 \cdot 49 + 48 \cdot 6,670 \cdot 3) \mod 1,247,290 \\
+        &= 19683
+    \end{align*}
+
+    \item The message \(m\) is the cube root of \(M\):
+    \[ m = \sqrt[3]{19683} = 27 \]
+\end{enumerate}
+
+Eve can thus recover the plaintext message without needing to factor the public keys.
+
+
+Given that the exponent \( e \) is small, Eve searches for the cube root of \( M \) to recover \( m \):
+\[ m = \sqrt[3]{M} \]
+
+Since \( M \) must be a perfect cube for the original message \( m \) to be an integer, Eve can efficiently recover \( m \) without needing to factor the moduli of the public keys.
+
 
 
 \paragraph{Task 5 (RSA signatures).} Alice decided to use the following hash function together with textbook RSA signature:
 \begin{center}
     $H$: $\mathbb{Z} \times \mathbb{Z} \rightarrow \mathbb{Z}^*_{55}$ defined by $H: (a,b) \rightarrow ab \mod{55}$.
 \end{center}
-This means that Alice hashes messages of the form $m = (a,b)$ and then signs hash with RSA signature. Alice's public key is $(n,e) = (55,3)$. Malicious Eve wants to obtain signature on bad message $m = (6,11)$, but she cannot interact with Alice and ask her to sign this message. Eve listened on communication channel between Alice and Bob and intercepted the following message-signature pairs:
+This means that Alice hases messages of the form $m = (a,b)$ and then signs hash with RSA signature. Alice's public key is $(n,e) = (55,3)$.
+Malicious Eve wants to obtain signature on bad message $m = (6,11)$, but she cannot interact with Alice and ask her to sign this message.
+Eve listened on communication channel between Alice and Bob and intercepted the following message-signature pairs:
 \begin{itemize}
     \item $(m_1, \sigma_1) = ((12,6), 8)$
     \item $(m_2, \sigma_2) = ((7,4), 52)$
@@ -179,9 +287,55 @@ This means that Alice hashes messages of the form $m = (a,b)$ and then signs has
     \item What will be signature on message $m = (6,11)$?
 \end{enumerate}
 
+Eve has intercepted the following message-signature pairs:
+
+\begin{align*}
+(m_1, \sigma_1) &= ((12, 6), 8) \\
+(m_2, \sigma_2) &= ((7, 4), 52) \\
+(m_3, \sigma_3) &= ((22, 8), 11)
+\end{align*}
+
+To verify the signatures, Eve checks if:
+
+\begin{equation*}
+    \sigma^e \mod n = H(m)
+\end{equation*}
+
+The hashes for each message are clculated as:
+
+\begin{align*}
+    H(m_1) &= 12 \cdot 6 \mod 55 = 17 \\
+    H(m_2) &= 7 \cdot 4 \mod 55 = 28 \\
+    H(m_3) &= 22 \cdot 8 \mod 55 = 11
+\end{align*}
+
+Verifying the signatures:
+
+\begin{align*}
+    8^3 \mod 55 &= 17 \quad \text{(True)} \\
+    52^3 \mod 55 &= 28 \quad \text{(True)} \\
+    11^3 \mod 55 &= 11 \quad \text{(True)}
+\end{align*}
+
+All valid. Eve can use these to impersonate when checked against Alice's public key.
+
+
+The hash of the message \( m = (6, 11) \) is:
+
+\begin{equation*}
+    H(m) = 6 \cdot 11 \mod 55 = 11
+\end{equation*}
+
+To find the signature \(\sigma\) for the message \(m\), we would need to compute \(\sigma = H(m)^d \mod n\), where \(d\) is Alice's private key.
+
+\begin{equation*}
+    \sigma = 11^d \mod 55 = 11
+\end{equation*}
 
 \paragraph{Bonus Task} 
-Alice invented her own protocol to share message with Bob. She decided to use encryption algorithm that has following property: $Enc(k_a, Enc(k_b, m)) = Enc(k_b, Enc(k_a, m))$. Protocol works as:
+Alice invented her own protocol to share message with Bob.
+She decided to use encryption algorithm that has following property: $Enc(k_a, Enc(k_b, m)) = Enc(k_b, Enc(k_a, m))$.
+Protocol works as:
 \begin{enumerate}
     \item Alice calculates $c_a = Enc(k_a, m)$ where $m$ - message, $k_a$ - key generated by Alice. She sends $c_a$ to Bob. 
     \item Bob calculates $c=Enc(k_b, c_a)$, where $k_b$ - key generated by Bob. He sends $c$ to Alice.
@@ -189,8 +343,18 @@ Alice invented her own protocol to share message with Bob. She decided to use en
     \item Bob calculates $m=Dec(k_b, c_b)$.
 \end{enumerate}
 
-Assume that adversary Eve has full control over a public channel that Alice and Bob use to communicate. However, Eve cannot break cryptographic problems on which encryption algorithm relies. Show how Eve can retrieve message $m$. 
+Assume that adversary Eve has full control over a public channel that Alice and Bob use to communicate.
+However, Eve cannot break cryptographic problems on which encryption algorithm relies. Show how Eve can retrieve message $m$.
 
-
+\begin{enumerate}
+    \item Alice sends \( c_a = \text{Enc}(k_a, m) \) to Bob.
+    \item Eve intercepts \( c_a \) and replaces it with \( c'_a \), which is \( c'_a = \text{Enc}(k_a, m') \) for some message \( m' \) chosen by Eve.
+    \item Bob receives \( c'_a \) and encrypts it with his key \( k_b \), then sends \( c = \text{Enc}(k_b, c'_a) \) back to Alice.
+    \item Eve intercepts \( c \) and since she knows \( c'_a \), she can calculate \( c_b = \text{Dec}(k_a, c) = \text{Dec}(k_a, \text{Enc}(k_b, c'_a)) = \text{Enc}(k_b, m') \).
+    \item Alice receives \( c_b \), decrypts it with her private key to get \( \text{Dec}(k_a, c_b) = \text{Dec}(k_a, \text{Enc}(k_b, m')) = m' \) (Eve's chosen message), and thinks that \( m' \) is the original message \( m \).
+\end{enumerate}
+We can see that if the encryption and decryption functions are perfect inverses, then Eve can manipulate the messages without needing to decrypt the original message \( m \).
+Eve can carry out this attack because the protocol does not authenticate the parties to each other; it only encrypts the message.
+    So technically, I didn't find the original message \( m \), but I did find a message \( m' \) that Alice thinks is the original message \( m \) - which kind of means I found \( m \) in a way?
 
 \end{document}
