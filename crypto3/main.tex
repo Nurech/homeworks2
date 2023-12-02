@@ -1,0 +1,196 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[sfdefault,ultralight]{FiraSans} %% option 'sfdefault' activates Fira Sans as the default text font
+\usepackage[T1]{fontenc}
+\renewcommand*\oldstylenums[1]{{\firaoldstyle #1}}
+
+\usepackage{graphicx}
+\usepackage{amsfonts} 
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{fdsymbol}
+\usepackage{wasysym}
+\usepackage{multicol}
+\usepackage{amsmath,seqsplit}
+\usepackage{algorithm, algorithmic}
+\usepackage{tcolorbox}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ right=20mm,
+ left=25mm,
+ top=25mm,
+ bottom=25mm,
+ }
+
+\setlength{\columnsep}{1cm}
+\setlength\parindent{0pt}
+
+\definecolor{pink}{RGB}{244,194,194}
+\definecolor{green}{RGB}{143,188,143}
+\definecolor{red}{RGB}{190,0,50}
+\definecolor{ttgrey}{rgb}{0.58,0.59,0.69}
+\definecolor{ttblue}{rgb}{0.2,0.17,0.38}
+\definecolor{ttred}{rgb}{0.67,0.07,0.32}
+
+
+\begin{document}
+
+\begin{tcolorbox}[colframe=ttblue, colback=ttblue!10]
+\begin{center}
+\begin{large}
+\textbf{Third homework Joosep Parts 221963IVCM}
+\end{large}
+\end{center}
+\end{tcolorbox}
+
+\section*{Tasks}
+
+\paragraph{Task 1 (Diffie-Hellman).} Answer the following questions based on the RFC of Diffie-Hellman key agreement \\ \url{https://www.ietf.org/rfc/rfc2631.txt}. Reference the relevant sections in your answer but use your own words.
+\begin{enumerate}
+    \item How the cryptographic keying material derived from the shared secret number is typically used?\\
+    The cryptographic keying material is derived from the shared secret number, denoted as $ZZ$, through a process that ensures both parties involved in the communication can generate the same symmetric encryption key. This keying material is derived using the following method, as described in section 2.1.2 of the RFC 2631:
+
+    \begin{equation*}
+        KM = H(ZZ \parallel \text{OtherInfo})
+    \end{equation*}
+
+    where $H$ represents the message digest function, specifically SHA-1, and $ZZ$ is the shared secret value. The $ZZ$ value must include leading zeros to ensure it occupies as many octets as the prime number $p$. For example, if $p$ is 1024 bits, then $ZZ$ should be 128 bytes long.
+    To generate the KEK, one or more blocks of $KM$ are created, with the counter incremented for each block until sufficient keying material has been generated. These blocks are concatenated to form the KEK:
+    \begin{equation*}
+        KEK = KM(\text{counter}=1) \parallel KM(\text{counter}=2) \parallel \ldots
+    \end{equation*}
+    The secret entropy of this process comes from $ZZ$.
+    Even if a longer string than $ZZ$ is produced, the effective key space of the KEK is limited by the size of $ZZ$.
+    \item How the shared secret ZZ is defined?
+    The shared secret in the Diffie-Hellman key agreement, denoted as \( ZZ \), is defined by the equation:
+
+    \begin{equation*}
+        ZZ = g^{(xb \cdot xa)} \mod p
+    \end{equation*}
+
+    Here, \( g \) is a generator value agreed upon by both parties, \( p \) is a large prime number, and \( xa \) and \( xb \) are the private keys of party A and party B, respectively. The computed value of \( ZZ \) is the result of party A raising party B's public key to the power of their own private key modulo \( p \), and vice versa for party B. This results in both parties arriving at the same shared secret, which can then be used to derive a symmetric key for encryption and decryption of messages.
+
+
+    \item Where the primality test is used? How the robust primality test is defined?
+    In the Diffie-Hellman key agreement method, a primality test is employed during the generation of the group parameters, specifically the primes \( p \) and \( q \).
+    A robust primality test is defined as a test where the probability that a composite number is erroneously identified as a prime is at most \( 2^{-80} \).
+    This stringent requirement is essential because the security of the Diffie-Hellman method depends on the hardness of the discrete logarithm problem, which assumes \( p \) and \( q \) are prime.
+    If composite numbers were mistakenly used, the discrete logarithm problem could be more easily solved, compromising the encryption.
+    The robust primality test thus ensures the integrity of \( p \) and \( q \) as prime numbers, forming the basis for preventing adversaries from determining the shared secret key used by the communicating parties for encryption and decryption purposes.
+
+    \item Why the group parameter validation process is needed?
+    Group parameter validation is a critical security measure in the Diffie-Hellman key agreement method.
+    It verifies that the parameters \( p \) and \( q \) satisfy the equation \( p = qj + 1 \), confirming they adhere to the X9.42 standards for secure Diffie-Hellman implementations.
+    It ensures that the parameters are generated in a truly random and non-predictable manner, which is vital to prevent potential attackers from exploiting any patterns in the parameter generation process.
+    For example, consider the validation of a prime number \( p \).
+    The recipient of the key can check that \( p \) is of the correct form by confirming that for some integer \( j \), \( p = qj + 1 \).
+    This check is not just a formality; it guarantees that \( p \) is part of a group that resists certain types of cryptographic attacks, thus upholding the strength of the key agreement protocol.
+
+    \item What is ephemeral-static mode and how is it different from static-static mode?
+    In Ephemeral-Static Mode, the sender generates a new ephemeral key pair for each communication session, while the recipient uses a static, often certified, key pair.
+    This results in a different shared secret \( ZZ \) for each session, providing enhanced security.
+    In Static-Static Mode Both parties use static key pairs that do not change over time.
+    This can lead to the same shared secret \( ZZ \) for each session unless measures such as introducing unique partyAInfo are taken.
+    Ephemeral-Static mode differs from Static-Static mode in that the former generates a new key pair for each session, ensuring a unique shared secret each time, while the latter uses fixed key pairs, resulting in a consistent shared secret across sessions unless additional unique information is provided to diversify the keys.
+
+\end{enumerate}
+
+
+\paragraph{Task 2 (Security definitions).} Suppose you are given the following encryption scheme:
+\begin{tcolorbox}[colback=white]
+\begin{multicols}{2}
+$\mathsf{KeyGen}():$
+\begin{enumerate}
+    \item Sample large prime number $p$ 
+    \item Compute modulus as $n = p^2$
+    \item Select $e$ to be integer such that $\text{GCD}(\phi(n), e) = 1$ and $2 < e < \phi(n)$
+    \item Calculate $d$ such that $e \cdot d \equiv 1 \mod \phi(n)$
+    \item Return private key  $sk = (d,n)$ and public key $pk = (e,n)$
+\end{enumerate}
+
+\columnbreak
+$\mathsf{Enc}(pk,m):$
+\begin{enumerate}
+    \item Compute ciphertext as $c = m^e \mod n$ 
+\end{enumerate}
+
+$\mathsf{Dec}(sk,c):$
+\begin{enumerate}
+    \item Compute decryption as $m = c^d \mod n$
+\end{enumerate}
+\end{multicols}
+\end{tcolorbox}
+
+It could be useful to notice that instead of standart RSA, we are using a variant of RSA where the modulus $n$ is $n = 2p^2$ instead of $n = pq$ (where $p$ and $q$ are distinct prime numbers).
+Given a public key \( (e, n) \) and modulus \( n = p^2 \), we could maybe perform the following attack:
+
+\begin{enumerate}
+    \item Compute the square root of \( n \) to retrieve \( p \), since \( n \) is a perfect square.
+    \item Compute \( \varphi(n) = p(p-1) \), leveraging the property \( \varphi(p) = p-1 \) for a prime \( p \).
+    \item Calculate the private exponent \( d \) using the Extended Euclidean Algorithm to satisfy \( d \cdot e \equiv 1 \mod \varphi(n) \).
+    \item Decrypt any ciphertext \( c \) with the found private key \( (d, n) \) to retrieve the message \( m \), as \( m = c^d \mod n \).
+\end{enumerate}
+
+The ability to efficiently compute \( p \) from \( n \) undermines the entire encryption scheme, as the security of RSA relies on the difficulty of factoring the modulus \( n \), typically a product of two distinct large primes. In this case, the ease of factoring \( n \) leads to a complete breakdown of the system's security.
+Eve intercepts the public key \( (e, n) \) and observes that \( n = p^2 \). Let's say \( e = 3 \) and \( n = 121 \), which implies \( p \) could be \( 11 \) since \( 11^2 = 121 \).
+
+\begin{enumerate}
+    \item Calculate \( p \) as the square root of \( n \):
+    \[ p = \sqrt{n} = \sqrt{121} = 11 \]
+    \item Compute \( \varphi(n) \) using \( p \):
+    \[ \varphi(n) = p(p - 1) = 11 \times 10 = 110 \]
+    \item Find \( d \) such that \( d \cdot e \equiv 1 \mod \varphi(n) \):
+    \[ 3 \cdot d \equiv 1 \mod 110 \]
+    Eve computes \( d = 73 \) as the modular inverse of \( e \).
+    \item Decrypt a ciphertext \( c \) with the private key \( (d, n) \):
+    \[ m = c^d \mod n \]
+    For example, if \( c = 27 \), then:
+    \[ m = 27^{73} \mod 121 \]
+    Which Eve computes to find the original message \( m \).
+\end{enumerate}
+
+
+\paragraph{Task 3 (ElGamal encryption).} Consider the ElGamal cryptosystem with a public key $h$ and a private key $x$.
+\begin{enumerate}
+    \item Adversary Eve has intercepted ElGamal ciphertext $c = (c_1,c_2)$ that she wants to decrypt. Suppose that Eve has a friend that provides her with the decryption of any other chosen ciphertext $c' \neq c $. Show how can Eve decrypt $c$.
+    \item Adversary Carol intercepted two ElGamal ciphertexts $(c_{11} , c_{12})$ and $(c_{21} , c_{22})$ that correspond to some plaintext messages (not known to Eve) $m_1$ and $m_2$. What information can Eve learn about $m_1$ and $m_2$, if she observes that $c_{11} = c_{21}$?
+\end{enumerate}
+
+\paragraph{Task 4 (RSA encryption).} Alice sends the same invitation to her wedding with Bob to their three friends: Albus (with $pk_1=(115,3)$), Charlie (with $pk_2=(58,3)$) and Dan (with $pk_3=(187,3)$). Invitation $m$ is encrypted using the RSA algorithm. \\
+
+Eve was not invited to the wedding but wants to come there, she needs to find out address of the wedding venue. Eve intercepts all $3$ ciphertexts $c_1= 18,c_2= 21,c_3= 48$. Show how can Eve recover the invitation message $m$ without factoring public keys. What is plaintext message $m$?
+
+
+\paragraph{Task 5 (RSA signatures).} Alice decided to use the following hash function together with textbook RSA signature:
+\begin{center}
+    $H$: $\mathbb{Z} \times \mathbb{Z} \rightarrow \mathbb{Z}^*_{55}$ defined by $H: (a,b) \rightarrow ab \mod{55}$.
+\end{center}
+This means that Alice hashes messages of the form $m = (a,b)$ and then signs hash with RSA signature. Alice's public key is $(n,e) = (55,3)$. Malicious Eve wants to obtain signature on bad message $m = (6,11)$, but she cannot interact with Alice and ask her to sign this message. Eve listened on communication channel between Alice and Bob and intercepted the following message-signature pairs:
+\begin{itemize}
+    \item $(m_1, \sigma_1) = ((12,6), 8)$
+    \item $(m_2, \sigma_2) = ((7,4), 52)$
+    \item $(m_3, \sigma_3) = ((22,8), 11)$
+\end{itemize}
+
+\begin{enumerate}
+    \item Which of these messages will be useful for Eve and why? 
+    \item What will be signature on message $m = (6,11)$?
+\end{enumerate}
+
+
+\paragraph{Bonus Task} 
+Alice invented her own protocol to share message with Bob. She decided to use encryption algorithm that has following property: $Enc(k_a, Enc(k_b, m)) = Enc(k_b, Enc(k_a, m))$. Protocol works as:
+\begin{enumerate}
+    \item Alice calculates $c_a = Enc(k_a, m)$ where $m$ - message, $k_a$ - key generated by Alice. She sends $c_a$ to Bob. 
+    \item Bob calculates $c=Enc(k_b, c_a)$, where $k_b$ - key generated by Bob. He sends $c$ to Alice.
+    \item Using the property of encryption algorithm, Alice calculates $c_b=Dec(k_a, c)$. She sends $c_b$ to Bob.
+    \item Bob calculates $m=Dec(k_b, c_b)$.
+\end{enumerate}
+
+Assume that adversary Eve has full control over a public channel that Alice and Bob use to communicate. However, Eve cannot break cryptographic problems on which encryption algorithm relies. Show how Eve can retrieve message $m$. 
+
+
+
+\end{document}

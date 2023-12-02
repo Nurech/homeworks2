@@ -1,0 +1,148 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[sfdefault,ultralight]{FiraSans} %% option 'sfdefault' activates Fira Sans as the default text font
+\usepackage[T1]{fontenc}
+\renewcommand*\oldstylenums[1]{{\firaoldstyle #1}}
+
+\usepackage{graphicx}
+\usepackage{amsfonts} 
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{fdsymbol}
+\usepackage{wasysym}
+\usepackage{multicol}
+\usepackage{amsmath,seqsplit}
+\usepackage{algorithm, algorithmic}
+\usepackage{tcolorbox}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ right=20mm,
+ left=25mm,
+ top=25mm,
+ bottom=25mm,
+ }
+
+\setlength{\columnsep}{1cm}
+\setlength\parindent{0pt}
+
+\definecolor{pink}{RGB}{244,194,194}
+\definecolor{green}{RGB}{143,188,143}
+\definecolor{red}{RGB}{190,0,50}
+\definecolor{ttgrey}{rgb}{0.58,0.59,0.69}
+\definecolor{ttblue}{rgb}{0.2,0.17,0.38}
+\definecolor{ttred}{rgb}{0.67,0.07,0.32}
+
+
+\begin{document}
+
+\begin{tcolorbox}[colframe=ttblue, colback=ttblue!10]
+\begin{center}
+\begin{large}
+\textbf{Third homework}
+\end{large}
+\end{center}
+\end{tcolorbox}
+
+\section{Important notices:}
+\begin{itemize}
+    \item \textcolor{ttred}{\textbf{If you have any questions regarding the tasks, please do not hesitate to contact instructors.}} 
+    \item Consider reading extended syllabus about academic policies and point system.
+    \item \textcolor{ttred}{\textbf{Bruteforce is not a solution}} 
+    \item This assignment gives you 15\% of the final grade.
+    \item \textcolor{ttred}{\textbf{Provide an explicit explanation to your solutions. Providing answers to the task with no explanation (e.g. giving answer to the task without providing computations that you did to receive that solution) will give you $0$ points.}}
+    \item Your solution should be in the PDF format. You may either scan a handwritten solution or type your solution in Latex (\LaTeX)/Word and export it into PDF. 
+    \item You may write the programming code to solve any task. However, you have to explain explicitly the code logic in your submission and how it helped you solving the task. Providing the code with no explanations will give you $0$ points for the task. You must submit your code either in the appendix of your submission or to a public repository (GitHub, Bitbucket, Gitlab).
+    \item Using online tools or/and someone's else code to solve the tasks is prohibited. If you are suspected of this, then you will receive $0$ for the task.
+    \item Plagiarism is prohibited. If you are suspected of this, then you will receive $0$ for the task and will be reported to the Dean's office and Program Manager.
+    \item This assignment is due \textcolor{ttred} {\textbf{3rd of December, 23:59}}. 
+\end{itemize}
+
+\newpage
+
+\section*{Tasks}
+
+\paragraph{Task 1 (Diffie-Hellman).} Answer the following questions based on the RFC of Diffie-Hellman key agreement \\ \url{https://www.ietf.org/rfc/rfc2631.txt}. Reference the relevant sections in your answer but use your own words.
+\begin{enumerate}
+    \item How the cryptographic keying material derived from the shared secret number is typically used?
+    \item How the shared secret ZZ is defined?
+    \item Where the primality test is used? How the the robust primality test is defined?
+    \item Why the group parameter validation process is needed?
+    \item What is ephemeral-static mode and how is it different from static-static mode?
+\end{enumerate}
+
+
+\paragraph{Task 2 (Security definitions).} Suppose you are given the following encryption scheme:
+\begin{tcolorbox}[colback=white]
+\begin{multicols}{2}
+$\mathsf{KeyGen}():$
+\begin{enumerate}
+    \item Sample large prime number $p$ 
+    \item Compute modulus as $n = p^2$
+    \item Select $e$ to be integer such that $\text{GCD}(\phi(n), e) = 1$ and $2 < e < \phi(n)$
+    \item Calculate $d$ such that $e \cdot d \equiv 1 \mod \phi(n)$
+    \item Return private key  $sk = (d,n)$ and public key $pk = (e,n)$
+\end{enumerate}
+
+\columnbreak
+$\mathsf{Enc}(pk,m):$
+\begin{enumerate}
+    \item Compute ciphertext as $c = m^e \mod n$ 
+\end{enumerate}
+
+$\mathsf{Dec}(sk,c):$
+\begin{enumerate}
+    \item Compute decryption as $m = c^d \mod n$
+\end{enumerate}
+\end{multicols}
+\end{tcolorbox}
+
+Your task is to provide an attack that shows that given encryption scheme is not secure with respect to the following security game: 
+\begin{center}
+    \includegraphics[width=0.9\textwidth]{HW3/ind-cpa.png} 
+\end{center}
+
+
+\paragraph{Task 3 (ElGamal encryption).} Consider the ElGamal cryptosystem with a public key $h$ and a private key $x$.
+\begin{enumerate}
+    \item Adversary Eve has intercepted ElGamal ciphertext $c = (c_1,c_2)$ that she wants to decrypt. Suppose that Eve has a friend that provides her with the decryption of any other chosen ciphertext $c' \neq c $. Show how can Eve decrypt $c$.
+    \item Adversary Carol intercepted two ElGamal ciphertexts $(c_{11} , c_{12})$ and $(c_{21} , c_{22})$ that correspond to some plaintext messages (not known to Eve) $m_1$ and $m_2$. What information can Eve learn about $m_1$ and $m_2$, if she observes that $c_{11} = c_{21}$?
+\end{enumerate}
+
+\paragraph{Task 4 (RSA encryption).} Alice sends the same invitation to her wedding with Bob to their three friends: Albus (with $pk_1=(115,3)$), Charlie (with $pk_2=(58,3)$) and Dan (with $pk_3=(187,3)$). Invitation $m$ is encrypted using the RSA algorithm. \\
+
+Eve was not invited to the wedding but wants to come there, she needs to find out address of the wedding venue. Eve intercepts all $3$ ciphertexts $c_1= 18,c_2= 21,c_3= 48$. Show how can Eve recover the invitation message $m$ without factoring public keys. What is plaintext message $m$?
+
+
+\paragraph{Task 5 (RSA signatures).} Alice decided to use the following hash function together with textbook RSA signature:
+\begin{center}
+    $H$: $\mathbb{Z} \times \mathbb{Z} \rightarrow \mathbb{Z}^*_{55}$ defined by $H: (a,b) \rightarrow ab \mod{55}$.
+\end{center}
+This means that Alice hashes messages of the form $m = (a,b)$ and then signs hash with RSA signature. Alice's public key is $(n,e) = (55,3)$. Malicious Eve wants to obtain signature on bad message $m = (6,11)$, but she cannot interact with Alice and ask her to sign this message. Eve listened on communication channel between Alice and Bob and intercepted the following message-signature pairs:
+\begin{itemize}
+    \item $(m_1, \sigma_1) = ((12,6), 8)$
+    \item $(m_2, \sigma_2) = ((7,4), 52)$
+    \item $(m_3, \sigma_3) = ((22,8), 11)$
+\end{itemize}
+
+\begin{enumerate}
+    \item Which of these messages will be useful for Eve and why? 
+    \item What will be signature on message $m = (6,11)$?
+\end{enumerate}
+
+
+\paragraph{Bonus Task} 
+Alice invented her own protocol to share message with Bob. She decided to use encryption algorithm that has following property: $Enc(k_a, Enc(k_b, m)) = Enc(k_b, Enc(k_a, m))$. Protocol works as:
+\begin{enumerate}
+    \item Alice calculates $c_a = Enc(k_a, m)$ where $m$ - message, $k_a$ - key generated by Alice. She sends $c_a$ to Bob. 
+    \item Bob calculates $c=Enc(k_b, c_a)$, where $k_b$ - key generated by Bob. He sends $c$ to Alice.
+    \item Using the property of encryption algorithm, Alice calculates $c_b=Dec(k_a, c)$. She sends $c_b$ to Bob.
+    \item Bob calculates $m=Dec(k_b, c_b)$.
+\end{enumerate}
+
+Assume that adversary Eve has full control over a public channel that Alice and Bob use to communicate. However, Eve cannot break cryptographic problems on which encryption algorithm relies. Show how Eve can retrieve message $m$. 
+
+
+
+\end{document}
